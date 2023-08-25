@@ -32,7 +32,19 @@ async function run() {
             const cursor = productCollection.find(query);
             const products = await cursor.toArray();
             res.send(products);
-        })
+        });
+
+
+        // Get random sample of 6 products
+        app.get("/randomProduct", async (req, res) => {
+            const pipeline = [
+                { $sample: { size: 6 } } // Get a random sample of size 6
+            ];
+
+            const cursor = productCollection.aggregate(pipeline);
+            const randomProducts = await cursor.toArray();
+            res.send(randomProducts);
+        });
 
 
         //category based products get API
