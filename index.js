@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -54,7 +54,27 @@ async function run() {
             const cursor = productCollection.find(query);
             const products = await cursor.toArray();
             res.send(products);
-        })
+        });
+
+        // Get a single product by ID
+        app.get("/product/:id", async (req, res) => {
+            const productId = req.params.id;
+            console.log(productId);
+
+            try {
+                const query = { _id: new ObjectId(productId) };
+                const product = await productCollection.findOne(query);
+                //checking if the product with this id exist or not
+                if (!product) {
+                    return res.status(404).send("Product not found.");
+                }
+
+                res.send(product);
+            } catch (error) {
+                console.error(error);
+                res.status(500).send("Internal Server Error");
+            }
+        });
 
     } finally {
         // await client.close();
